@@ -1,6 +1,6 @@
 # PATIKA.DEV Projects
 
-## ODEV-2 Post Sıralama ve Post Ekleme
+### ODEV 2 Post Sıralama ve Post Ekleme
 <details>  
   <summary>Details</summary>
 
