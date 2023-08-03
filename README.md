@@ -41,3 +41,39 @@ showPosts()
 </details>
 
 * * *
+
+
+### ODEV 3 Daire Modülü
+<details>  
+  <summary>Details</summary>
+
+### circle.js
+
+````js
+const pi = 3.14159265359
+
+function circleArea(radius) {
+    const area = pi * Math.pow(radius, 2)
+    console.log('Circle Area', area)
+}
+
+function circleCircumference(radius) {
+    const circumference = 2 * pi * radius
+    console.log('Circle Circumference', circumference)
+}
+
+module.exports = {
+    circleArea,
+    circleCircumference,
+}
+````
+
+### index.js
+
+```js
+const { circleArea, circleCircumference } = require('./circle')
+
+circleArea(5)
+circleCircumference(5)
+```
+</details>
