@@ -1,9 +1,28 @@
-const fs = require('fs')
+const http = require('http')
 
-fs.rmdir('patika', { recursive: true }, (err) => {
-    if (err) throw err
-    console.log('Klasorler silindi.')
+const server = http.createServer((req, res) => {
+    const url = req.url
+
+    if (url === '/') {
+        res.writeHead(200, { 'Content-Type': 'text/html' })
+        res.write('<h1>INDEX SAYFASI</h1>')
+    } else if (url === '/about') {
+        res.writeHead(200, { 'Content-Type': 'text/html' })
+        res.write('<h1>ABOUT SAYFASI</h1>')
+    } else {
+        res.writeHead(404, { 'Content-Type': 'text/html' })
+        res.write('<h1>404 SAYFA BULUNAMADI</h1>')
+    }
+
+    res.end() //cevap vermek icin res.end() kullanmaliyiz
 })
 
-//fs.mkdir('patika/img' boyle yazarsak patika klasoru varsa icine img klasoru olusturur. patika klasoru yoksa hata verir.
-//patika klasoru yokken iki klasor birden olusturmak istiyorsak `{ recursive: true }` yazmamiz gerekir.
+const port = 3000
+
+server.listen(port, () => {
+    console.log(`Sunucu port ${port} de başlatildi.`)
+})
+
+server.close(() => {
+    console.log('Sunucu kapatildi.')
+})
