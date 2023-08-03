@@ -1,5 +1,24 @@
 # PATIKA.DEV Projects
 
+### ODEV 1 Komut Satırı
+<details>  
+  <summary>Details</summary>
+
+### Code
+
+````js
+let value = process.argv.slice(2)
+
+const alan = (r) => {
+    console.log(`Yaricapi ${r} olan dairenin alani: ${Math.PI * r * r}.`)
+}
+
+alan(value)
+````
+</details>
+
+* * *
+
 ### ODEV 2 Post Sıralama ve Post Ekleme
 <details>  
   <summary>Details</summary>
