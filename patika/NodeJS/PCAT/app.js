@@ -28,6 +28,17 @@ app.get('/', async (req, res) => {
     })
 })
 
+//Her bir fotografa ozel tekil sayfalar olustrma
+//photo.ejs yonlendirmesini yakalama
+//index sayfasinda a hrefi ile gondermis oldugumuz id'yi yakalamak icin :id kullaniyoruz (id kelimesinin onemi yok)
+app.get('/photos/:id', async (req, res) => {
+    // console.log(req.params.id); //params ile id'yi yakaliyoruz
+    const photoId = await Photo.findById(req.params.id) //id'ye gore tekil veriyi aliyoruz
+    res.render('photo', {
+        photoId, //photo.ejs dosyasina gonderiyoruz <%= photoId.title %> boyle yazmaya degiskenle yazdirma deniliyor
+    })
+})
+
 app.get('/about', (req, res) => {
     res.render('about')
 })
@@ -48,8 +59,4 @@ app.listen(port, () => {
     console.log(`Sunucu port ${port} de başlatildi`)
 })
 
-//basarili sekilde mongodb de verilerimiz olusturuldu
-
-//ejs icerisinde js yazacaksak <% %> arasina yaziyoruz ve orada veritabanindan gelen verilere gore islem yapacagimiz icin for dongusune aldik
-
-//  <%= photos[i].title %>  bunlar nereden geliyor dersek models/Photo.js dosyasindan geliyor
+//her resmin icerisinde kendisine ait bilgiler olan bir html dosyamiz var bu yonlendirmeyi a tagi ile yapiyoruz ve hrefine /photos/${photo._id} yazdik bu unique id mongodb tarafindan otomatik olarak olusturuluyor
