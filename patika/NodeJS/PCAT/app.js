@@ -1,8 +1,16 @@
 const express = require('express')
+const mongoose = require('mongoose')
 const ejs = require('ejs')
 const path = require('path')
+const Photo = require('./models/Photo')
 
 const app = express()
+
+//connect DB
+mongoose.connect('mongodb://127.0.0.1:27017/pcat-test-db', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
 
 //TEMPLATE ENGINE
 app.set('view engine', 'ejs')
@@ -13,8 +21,11 @@ app.use(express.urlencoded({ extended: true })) //formdan gelen bilgileri okumak
 app.use(express.json()) //json formatinda gelen bilgileri okumak icin
 
 //ROUTES
-app.get('/', (req, res) => {
-    res.render('index')
+app.get('/', async (req, res) => {
+    const photos = await Photo.find({}) //veritabanindaki tum verileri aliyoruz
+    res.render('index', {
+        photos, //index.ejs dosyasina gonderiyoruz
+    })
 })
 
 app.get('/about', (req, res) => {
@@ -25,8 +36,9 @@ app.get('/add', (req, res) => {
     res.render('add')
 })
 
-app.post('/photos', (req, res) => {
-    console.log(req.body) //kullanicinin girdigi bilgileri gorebilmek icin
+//async await yapmamizin sebebi bu islemin bitmesini istememiz
+app.post('/photos', async (req, res) => {
+    await Photo.create(req.body) //formdan gelen bilgileri veritabanina yazdirma islemi
     res.redirect('/') //formdan gelen bilgileri alip index sayfasina yonlendiriyoruz
 })
 
@@ -36,6 +48,8 @@ app.listen(port, () => {
     console.log(`Sunucu port ${port} de başlatildi`)
 })
 
-//add.ejs formu method="POST" action="/photos" yaptik ve burada yonlendirmede de app.post('/photos') yaptik
-//post islemi yani form gibi yerlerde kullanici girdigi bilgileri sunucuya gonderir
-//console.log(req.body) ile gonderilen bilgileri gorebiliriz fakat bunun icinde exporess icerisinde bulunan middleware'leri kullanmamiz gerekiyor
+//basarili sekilde mongodb de verilerimiz olusturuldu
+
+//ejs icerisinde js yazacaksak <% %> arasina yaziyoruz ve orada veritabanindan gelen verilere gore islem yapacagimiz icin for dongusune aldik
+
+//  <%= photos[i].title %>  bunlar nereden geliyor dersek models/Photo.js dosyasindan geliyor
