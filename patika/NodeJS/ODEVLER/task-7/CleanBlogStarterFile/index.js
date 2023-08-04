@@ -21,9 +21,17 @@ app.use(express.json())
 
 app.get('/', async (req, res) => {
     const sdatas = await Sdata.find({})
-    console.log(sdatas);
     res.render('index', {
-        sdatas
+        sdatas,
+    })
+})
+
+//Her bir fotografa ozel tekil sayfalar olustrma
+app.get('/posts/:id', async (req, res) => {
+    const post = await Sdata.findById(req.params.id)
+    console.log(post);
+    res.render('post', {
+        post,
     })
 })
 
@@ -44,6 +52,5 @@ const port = 3000
 app.listen(port, () => {
     console.log(`Sunucu port ${port} de başlatildi.`)
 })
-
 
 //models/Sdata.js dosyasindan gelen verilerle formdaki input name bilgileri ayni olmali
