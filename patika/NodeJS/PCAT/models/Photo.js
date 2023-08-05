@@ -17,6 +17,3 @@ const PhotoSchema = new Schema({
 const Photo = mongoose.model('Photo', PhotoSchema)
 
 module.exports = Photo
-
-//dataCreated ile yuklenen resimlerin tarihlerini de kaydedebiliriz
-//veritabanina baglanma isini burada yapmiyoruz cunku app.js dosyasinda yapacagiz

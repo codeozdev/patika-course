@@ -1,9 +1,13 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const ejs = require('ejs')
+const methodOverride = require('method-override')
 const Sdata = require('./models/Sdata')
 
 const app = express()
+
+//contorollers
+const postController = require('./controllers/postController')
 
 //CONNECT DB
 mongoose.connect('mongodb://127.0.0.1:27017/cleanblog-test-db', {
@@ -18,22 +22,18 @@ app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+app.use(
+    methodOverride('_method', {
+        methods: ['POST', 'GET'],
+    }),
+)
 
-app.get('/', async (req, res) => {
-    const sdatas = await Sdata.find({})
-    res.render('index', {
-        sdatas,
-    })
-})
-
-//Her bir fotografa ozel tekil sayfalar olustrma
-app.get('/posts/:id', async (req, res) => {
-    const post = await Sdata.findById(req.params.id)
-    console.log(post);
-    res.render('post', {
-        post,
-    })
-})
+//ROUTES
+app.get('/', postController.getAllPosts)
+app.get('/posts/:id', postController.getPost)
+app.post('/sdatas', postController.createPost)
+app.put('/posts/:id', postController.updatePost )
+app.delete('/posts/:id',postController.deletePost)
 
 app.get('/about', (req, res) => {
     res.render('about')
@@ -42,10 +42,24 @@ app.get('/add_post', (req, res) => {
     res.render('add_post')
 })
 
-app.post('/sdatas', async (req, res) => {
-    await Sdata.create(req.body)
-    res.redirect('/')
+
+//update edit sayfasina yonlendirme
+app.get('/posts/:id', (req, res) => {
+    const post = Sdata.findById(req.params.id)
+    res.render('post', {
+        post,
+    })
 })
+
+//edit sayfasi
+app.get('/posts/edit/:id', async (req, res) => {
+    const post = await Sdata.findById(req.params.id)
+    res.render('edit', {
+        post,
+    })
+})
+
+
 
 const port = 3000
 

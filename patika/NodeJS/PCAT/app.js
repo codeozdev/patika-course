@@ -45,16 +45,11 @@ app.delete('/photos/:id', photoControllers.deletePhoto)
 //Page
 app.get('/about', pageController.getAboutPage)
 app.get('/add', pageController.getAddPage)
-//Update Details button sayfasi
+//Update Details edit sayfasi
 app.get('/photos/edit/:id', pageController.getEditPage)
 
-const port = 3000
+const port = 3001
 
 app.listen(port, () => {
     console.log(`Sunucu port ${port} de başlatildi`)
 })
-
-//MVC
-//vivews klasorunun icerisi sunum katmanidir. burada html kodlari yazilir
-//models klasoru veritabani katmanidir. burada veritabani islemleri yapilir
-//controllers klasoru ise views ve models klasoru arasindaki iliskiyi saglar. burada veritabanindan verileri ceker ve views'e gonderir. bu klasorde gelen isteklere karsi yonlendirmeleri yapacagiz

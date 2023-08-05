@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const SdataSchema = new Schema({
     title: String,
     details: String,
-    dateCreated: {
+    dataCreated: {
         type: Date,
         default: Date.now,
     },

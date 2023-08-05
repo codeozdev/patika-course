@@ -8,7 +8,7 @@ exports.getAddPage = (req, res) => {
   res.render('add')
 }
 
-//Update Details button sayfasi
+//Update edit  sayfasi
 exports.getEditPage = async (req, res) => {
   const photo = await Photo.findById(req.params.id)
   res.render('edit', {
