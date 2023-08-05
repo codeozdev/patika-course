@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const fileUpload = require('express-fileupload')
+const methodOverride = require('method-override')
 const ejs = require('ejs')
 const path = require('path')
 const Photo = require('./models/Photo')
@@ -21,7 +22,8 @@ app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-app.use(fileUpload()) //file upload icin middleware (resimleri yuklemek icin)
+app.use(fileUpload())
+app.use(methodOverride('_method')) //put requesti post requeste ceviriyor
 
 //ROUTES
 app.get('/', async (req, res) => {
@@ -31,7 +33,7 @@ app.get('/', async (req, res) => {
     })
 })
 
-//RESIMIN DETAY SAYFASI
+//Resimlerin detay sayfasi
 app.get('/photos/:id', async (req, res) => {
     // console.log(req.params.id); //params ile id'yi yakaliyoruz
     const photoId = await Photo.findById(req.params.id)
@@ -48,7 +50,7 @@ app.get('/add', (req, res) => {
     res.render('add')
 })
 
-//RESIMIN YUKLEMESI
+//Resmin yuklenmesi
 app.post('/photos', async (req, res) => {
     //console.log(req.files.image)  //yuklenen resimlerin bilgilerini konsola yazdiriyoruz
 
@@ -72,11 +74,32 @@ app.post('/photos', async (req, res) => {
     })
 })
 
+//Guncelleme sayfasinda verileri gosterme
+app.get('/photos/edit/:id', async (req, res) => {
+    const photo = await Photo.findById(req.params.id)
+    res.render('edit', {
+        photo,
+    })
+})
+
+//Guncelleme sayfasindaki verileri guncelleme
+app.put('/photos/:id', async (req, res) => {
+    const photo = await Photo.findById(req.params.id)
+    photo.title = req.body.title //verilerin guncellenmesi
+    photo.description = req.body.description //verilerin guncellenmesi
+    photo.save() //veritabanina kaydetme islemi
+
+    res.redirect(`/photos/${req.params.id}`) //guncelleme isleminden sonra detay sayfasina yonlendirme
+})
+
 const port = 3000
 
 app.listen(port, () => {
     console.log(`Sunucu port ${port} de başlatildi`)
 })
 
-//Veri tabanlarinda gorselleri saklayamiyoruz sadece pathini koyabiliriz
-//encType="multipart/form-data"> bunu formumuza ekliyoruz
+//edit.ejs dosyasinda degiskenler olusturduk ve form action kisminda put islemini override yaptik
+//Guncelleme sayfasinda title ve descriptionlarin input icerisinde yazili olmasi icin edit.ejs dosyasinda value ozelliginine degiskenleri atadik
+
+//tarayicilar get ve post requestlerini destekler. get ile sayfalar arasi gecis yapilirken post ile veritabanina veri eklenir
+//put requesti tarayici desteklemedigi icin npm i method-override paketini yukledik. put requesti post requeste ceviriyor
