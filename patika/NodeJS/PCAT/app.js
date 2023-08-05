@@ -1,8 +1,10 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const fileUpload = require('express-fileupload')
 const ejs = require('ejs')
 const path = require('path')
 const Photo = require('./models/Photo')
+const fs = require('fs')
 
 const app = express()
 
@@ -17,25 +19,24 @@ app.set('view engine', 'ejs')
 
 //MIDDLEWARES
 app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true })) //formdan gelen bilgileri okumak icin
-app.use(express.json()) //json formatinda gelen bilgileri okumak icin
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(fileUpload()) //file upload icin middleware (resimleri yuklemek icin)
 
 //ROUTES
 app.get('/', async (req, res) => {
-    const photos = await Photo.find({}) //veritabanindaki tum verileri aliyoruz
+    const photos = await Photo.find({}).sort('-dataCreated') //tarihe gore siralama
     res.render('index', {
-        photos, //index.ejs dosyasina gonderiyoruz
+        photos,
     })
 })
 
-//Her bir fotografa ozel tekil sayfalar olustrma
-//photo.ejs yonlendirmesini yakalama
-//index sayfasinda a hrefi ile gondermis oldugumuz id'yi yakalamak icin :id kullaniyoruz (id kelimesinin onemi yok)
+//RESIMIN DETAY SAYFASI
 app.get('/photos/:id', async (req, res) => {
     // console.log(req.params.id); //params ile id'yi yakaliyoruz
-    const photoId = await Photo.findById(req.params.id) //id'ye gore tekil veriyi aliyoruz
+    const photoId = await Photo.findById(req.params.id)
     res.render('photo', {
-        photoId, //photo.ejs dosyasina gonderiyoruz <%= photoId.title %> boyle yazmaya degiskenle yazdirma deniliyor
+        photoId,
     })
 })
 
@@ -47,10 +48,28 @@ app.get('/add', (req, res) => {
     res.render('add')
 })
 
-//async await yapmamizin sebebi bu islemin bitmesini istememiz
+//RESIMIN YUKLEMESI
 app.post('/photos', async (req, res) => {
-    await Photo.create(req.body) //formdan gelen bilgileri veritabanina yazdirma islemi
-    res.redirect('/') //formdan gelen bilgileri alip index sayfasina yonlendiriyoruz
+    //console.log(req.files.image)  //yuklenen resimlerin bilgilerini konsola yazdiriyoruz
+
+    const uploadDir = 'public/uploads'
+
+    //Gorsellerin yuklenecegi klasorun olup olmadigini kontrol ediyoruz yoksa olusturuyoruz
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir)
+    }
+
+    let uploadeImage = req.files.image //gorsel bilgisini degiskene attik
+    let uploadPath = __dirname + '/public/uploads/' + uploadeImage.name //gorselin kaydedilecegi yeri belirledik. dosya olusturulmasi gerektigi icin core modul olan fs kullanacagiz
+
+    //Veritabanina kaydetme islemini yapiyoruz
+    uploadeImage.mv(uploadPath, async () => {
+        await Photo.create({
+            ...req.body,
+            image: '/uploads/' + uploadeImage.name,
+        })
+        res.redirect('/')
+    })
 })
 
 const port = 3000
@@ -59,4 +78,5 @@ app.listen(port, () => {
     console.log(`Sunucu port ${port} de başlatildi`)
 })
 
-//her resmin icerisinde kendisine ait bilgiler olan bir html dosyamiz var bu yonlendirmeyi a tagi ile yapiyoruz ve hrefine /photos/${photo._id} yazdik bu unique id mongodb tarafindan otomatik olarak olusturuluyor
+//Veri tabanlarinda gorselleri saklayamiyoruz sadece pathini koyabiliriz
+//encType="multipart/form-data"> bunu formumuza ekliyoruz
