@@ -23,7 +23,11 @@ app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(fileUpload())
-app.use(methodOverride('_method')) //put requesti post requeste ceviriyor
+app.use(
+    methodOverride('_method', {
+        methods: ['POST', 'GET'],
+    }),
+) //put requesti post requeste ceviriyor
 
 //ROUTES
 app.get('/', async (req, res) => {
@@ -92,14 +96,24 @@ app.put('/photos/:id', async (req, res) => {
     res.redirect(`/photos/${req.params.id}`) //guncelleme isleminden sonra detay sayfasina yonlendirme
 })
 
+//Resim silme
+app.delete('/photos/:id', async (req, res) => {
+    //ilk olarak buradaki islemler yapilacak
+    const photo = await Photo.findOne({ _id: req.params.id }) //id'ye gore nesneyi sectik
+    let deletedImage = __dirname + '/public' + photo.image //photo objesinin image ozellini sectik
+    fs.unlinkSync(deletedImage) //resmi sildik
+
+    //sonra veritabanindan silme islemi yapilacak
+    await Photo.findByIdAndRemove(req.params.id)
+    res.redirect('/')
+})
+
 const port = 3000
 
 app.listen(port, () => {
     console.log(`Sunucu port ${port} de başlatildi`)
 })
 
-//edit.ejs dosyasinda degiskenler olusturduk ve form action kisminda put islemini override yaptik
-//Guncelleme sayfasinda title ve descriptionlarin input icerisinde yazili olmasi icin edit.ejs dosyasinda value ozelliginine degiskenleri atadik
-
-//tarayicilar get ve post requestlerini destekler. get ile sayfalar arasi gecis yapilirken post ile veritabanina veri eklenir
-//put requesti tarayici desteklemedigi icin npm i method-override paketini yukledik. put requesti post requeste ceviriyor
+//photo.ejs update ve delete butonlari
+//resmi sunucudan guzelce siliyoruz fakat bizim public/uploads klasorundeki silinen resimleri de silmemiz lazim
+//delete buttonuna basildiginda direk silsin istemiyoruz. once bir onay isteyecegiz
