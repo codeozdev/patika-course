@@ -1,4 +1,6 @@
 const express = require('express')
+const pageRoute = require('./routes/pageRoute')
+
 
 const app = express()
 
@@ -9,17 +11,8 @@ app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
 //ROUTES
-app.get('/', (req, res) => {
-  res.status(200).render('index', {
-    page_name: 'index', //page_name adinda bir degisken olusturduk ve bunu index.ejs dosyasinda kullanacagiz
-  })
-})
+app.use('/', pageRoute)
 
-app.get('/about', (req, res) => {
-  res.status(200).render('about', {
-    page_name: 'about',  //page_name adinda bir degisken olusturduk ve bunu about.ejs dosyasinda kullanacagiz
-  })
-})
 
 const port = 3000
 
