@@ -20,3 +20,6 @@ const CourseSchema = new Schema({
 
 const Course= mongoose.model('Course', CourseSchema)
 module.exports = Course
+
+
+//Modelde bizden istenilen verilere gore Posmande veriler girdik
